@@ -33,6 +33,7 @@ normative:
   RFC1122:
   RFC1812:
   RFC4443:
+  RFC4884:
   RFC5927:
   RFC7279:
   RFC8200:
@@ -136,7 +137,7 @@ The following are exceptions to the IPv6 multicast, link-layer multicast, and li
 
 # Extensibility:
 
-Some ICMP messages are extensible {{RFC4443}}. However, the extension header MUST not cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes). 
+Some ICMP messages are extensible {{RFC4884}}. However, the extension header MUST not cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes). 
 
 # Acceptable Uses
 
