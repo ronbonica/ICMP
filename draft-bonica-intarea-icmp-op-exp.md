@@ -5,7 +5,7 @@ coding: us-ascii
 title: 'Internet Control Message Protocol (ICMP): Standards and Operational Experience'
 abbrev: ICMP Operational Experience
 docname: draft-bonica-intarea-icmp-op-exp
-category: info 
+category: info
 submissiontype: IETF
 
 stand_alone: yes
@@ -91,13 +91,13 @@ This document summarizes ICMP standards and operational experience. The purpose 
 
 # ICMP Message Types
 
-{{RFC1122}} and {{RFC4443}} make a distintion between ICMP error messages and ICMP information messages. An ICMP error messages indicates that a downstream node recieved a packet that it could not process. {{RFC0792}} refers to the unprocessed packet as the "original data datagram", while {{RFC4443}} refers to the unprocessed packet as the "invoking packet". In this document, we will adopt {{RFC4443}} terminology and call the unprocessed packet the "invoking packet". 
+{{RFC1122}} and {{RFC4443}} make a distintion between ICMP error messages and ICMP information messages. An ICMP error messages indicates that a downstream node recieved a packet that it could not process. {{RFC0792}} refers to the unprocessed packet as the "original data datagram", while {{RFC4443}} refers to the unprocessed packet as the "invoking packet". In this document, we will adopt {{RFC4443}} terminology and call the unprocessed packet the "invoking packet".
 
-Having received an invoking packet, the downstream node can send an ICMP error message to its originator. The ICMP error message indicates why the packet could not be processed. It also includes as much of the invoking packet as possible, without violating the ICMP message length limitations mentioned in ({{length}}). 
+Having received an invoking packet, the downstream node can send an ICMP error message to its originator. The ICMP error message indicates why the packet could not be processed. It also includes as much of the invoking packet as possible, without violating the ICMP message length limitations mentioned in ({{length}}).
 
 In ICMPv6, error messages are identified as such by a zero in the high-order bit of their message Type field values.  Thus, ICMPv6 error messages have message types from 0 to 127. ICMPv6 informational messages have message types from 128 to 255.
 
-In ICMPv4, error messages cannot be identified as such by a zero in the high-order bit of their message Type field values. 
+In ICMPv4, error messages cannot be identified as such by a zero in the high-order bit of their message Type field values.
 
 The Internet Assigned Numbers Authority (IANA) maintains one registy of ICMPv4 message types {{V4MSG}} and another registry of ICMPv6 message types {{V6MSG}}. Many ICMPv4 message types have been deprecated.
 
@@ -106,7 +106,7 @@ The Internet Assigned Numbers Authority (IANA) maintains one registy of ICMPv4 m
 
 ### Known ICMP Message Types
 
-According to {{RFC1122}} and {{RFC4443}}, when a node receives an ICMP error message, it must examine the message to determine: 
+According to {{RFC1122}} and {{RFC4443}}, when a node receives an ICMP error message, it must examine the message to determine:
 
 * whether the invoking packet originated on the local node
 * which local application or transport-layer protocol originated the invoking packet
@@ -135,9 +135,9 @@ According to {{RFC4443}}, an ICMPv4 error message must not be sent as the result
 
 * An ICMPv6 error message
 * An ICMPv6 redirect message
-* A packet destined to an IPv6 multicast address.  
-* A packet sent as a link-layer multicast 
-* A packet sent as a link-layer broadcast 
+* A packet destined to an IPv6 multicast address.
+* A packet sent as a link-layer multicast
+* A packet sent as a link-layer broadcast
 * A packet whose source address does not uniquely identify a single node e.g., the IPv6 Unspecified Address, an IPv6 multicast address, or an address known by the ICMP message originator to be an IPv6 anycast address)
 
 The following are exceptions to the IPv6 multicast, link-layer multicast, and link_layer broadcast rules above:
@@ -148,7 +148,7 @@ The following are exceptions to the IPv6 multicast, link-layer multicast, and li
 
 # Extensibility:
 
-Some ICMP messages are extensible {{RFC4884}}. However, the extension header MUST not cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes). 
+Some ICMP messages are extensible {{RFC4884}}. However, the extension header MUST not cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes).
 
 # Acceptable Uses
 
@@ -203,9 +203,19 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 
 # Translation Considerations
 
-Dan Wing: Please add text here
+IPv4 hosts will often communicate with an IPv4 host through an
+IPv4/IPv4 translator {{?RFC5508}} which may be located at the customer
+premise, ISP, or the server's datacenter.
 
-Relevant RFCs include {{RFC5508}} and {{RFC7915}}.
+IPv6-only hosts may communicate with IPv4-only hosts through an
+IPv6/IPv4 translator which might be stateless ({{RFC7915}},
+{{?RFC6791}}) or stateful ({{?RFC6146}}), and may be located at the
+customer premise or ISP (as a NAT64 service). Because of this
+translation, a received ICMP message will refer to the IPv4 host.
+
+IPv4 traffic may communicate with IPv6-only hosts through an
+IPv6/IPv4 translator located at the datacenter {{?RFC7755}}. This
+requires no special handling for the IPv4 host.
 
 # IANA Considerations
 
