@@ -33,6 +33,12 @@ author:
     org: Blue Fern Consulting
     country: USA
     email: cpignata@gmail.com
+ -
+    ins: D. Wing
+    name: Dan Wing
+    organization: Cloud Software Group Holdings, Inc.
+    abbrev: Cloud Software Group
+    email: danwing@gmail.com
 
 normative:
   RFC0768:
