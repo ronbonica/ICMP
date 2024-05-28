@@ -3,16 +3,17 @@ coding: utf-8
 coding: us-ascii
 
 title: 'Internet Control Message Protocol (ICMP): Standards and Operational Experience'
-abbrev: op-exp-icmp
+abbrev: ICMP Operational Experience
 docname: draft-bonica-intarea-icmp-op-exp
 category: info 
+submissiontype: IETF
 
 stand_alone: yes
 pi: [toc, tocompact, tocindent, sortrefs, symrefs, compact]
 
 ipr: trust200902
 area: Internet
-wg: INTAREA Group
+wg: INTAREA Working Group
 kw: ICMP operations
 
 author:
@@ -24,6 +25,14 @@ author:
     org: Juniper Networks
     country: USA
     email: rbonica@juniper.net
+  -
+    ins: C. Pignataro
+    name: Carlos Pignataro
+    city: Raleigh
+    region: NC
+    org: Blue Fern Consulting
+    country: USA
+    email: cpignata@gmail.com
 
 normative:
   RFC0768:
@@ -43,6 +52,8 @@ informative:
   RFC4950:
   RFC5837:
   RFC8335:
+  RFC5508:
+  RFC7915:
 
   V4MSG:
     title: Internet Control Message Protocol (ICMP) Parameters
@@ -50,7 +61,7 @@ informative:
       - org: Internet Assigned Numbers Authority (IANA)
     date: false
     seriesinfo:
-      Web: https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml
+      Web: https://www.iana.org/assignments/icmp-parameters
 
   V6MSG:
     title: Internet Control Message Protocol version 6 (ICMPv6) Parameters
@@ -58,7 +69,7 @@ informative:
       - org: Internet Assigned Numbers Authority (IANA)
     date: false
     seriesinfo:
-      Web: https://www.iana.org/assignments/icmpv6-parameters/icmpv6-parameters.xhtml
+      Web: https://www.iana.org/assignments/icmpv6-parameters
 
 
 --- abstract
@@ -193,6 +204,8 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 # Translation Considerations
 
 Dan Wing: Please add text here
+
+Relevant RFCs include {{RFC5508}} and {{RFC7915}}.
 
 # IANA Considerations
 

@@ -1,0 +1,560 @@
+
+
+
+
+INTAREA Working Group                                          R. Bonica
+Internet-Draft                                          Juniper Networks
+Intended status: Informational                              C. Pignataro
+Expires: 28 November 2024                           Blue Fern Consulting
+                                                             27 May 2024
+
+
+  Internet Control Message Protocol (ICMP): Standards and Operational
+                               Experience
+                    draft-bonica-intarea-icmp-op-exp
+
+Abstract
+
+   The Internet Control Message Protocol (ICMP) can be used to exchange
+   control information between hosts.  This document summarizes ICMP
+   standards and operational experience.  The purpose of this document
+   is to be used as a reference.  A document that mentions ICMP can
+   reference this document rather than repeating portions of its
+   content.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 28 November 2024.
+
+Copyright Notice
+
+   Copyright (c) 2024 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+
+
+
+
+
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 1]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
+   2.  Conventions and Definitions . . . . . . . . . . . . . . . . .   3
+   3.  ICMP Message Types  . . . . . . . . . . . . . . . . . . . . .   3
+     3.1.  Message Processing  . . . . . . . . . . . . . . . . . . .   3
+       3.1.1.  Known ICMP Message Types  . . . . . . . . . . . . . .   3
+       3.1.2.  Unknown ICMP Message Types  . . . . . . . . . . . . .   4
+   4.  ICMP Restrictions . . . . . . . . . . . . . . . . . . . . . .   4
+   5.  Extensibility:  . . . . . . . . . . . . . . . . . . . . . . .   5
+   6.  Acceptable Uses . . . . . . . . . . . . . . . . . . . . . . .   5
+   7.  Management Applications . . . . . . . . . . . . . . . . . . .   6
+   8.  General Issues  . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.1.  Transport . . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.2.  Rate Limits . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.3.  Forgery . . . . . . . . . . . . . . . . . . . . . . . . .   6
+     8.4.  Message Length  . . . . . . . . . . . . . . . . . . . . .   6
+     8.5.  Source Address Selection  . . . . . . . . . . . . . . . .   7
+   9.  Translation Considerations  . . . . . . . . . . . . . . . . .   7
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .   7
+   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .   7
+   13. References  . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     13.1.  Normative References . . . . . . . . . . . . . . . . . .   8
+     13.2.  Informative References . . . . . . . . . . . . . . . . .   9
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  10
+
+1.  Introduction
+
+   The Internet Control Message Protocol (ICMP) can be used to exchange
+   control information between hosts.  ICMPv4 [RFC0792] exchanges
+   control information between IPv4 [RFC0791] hosts while ICMPv6
+   [RFC4443] exchanges control information between IPv6 [RFC8200] hosts.
+
+   This document summarizes ICMP standards and operational experience.
+   The purpose of this document is to be used as a reference.  A
+   document that mentions ICMP can reference this document rather than
+   repeating portions of its content.
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 2]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+3.  ICMP Message Types
+
+   [RFC1122] and [RFC4443] make a distintion between ICMP error messages
+   and ICMP information messages.  An ICMP error messages indicates that
+   a downstream node recieved a packet that it could not process.
+   [RFC0792] refers to the unprocessed packet as the "original data
+   datagram", while [RFC4443] refers to the unprocessed packet as the
+   "invoking packet".  In this document, we will adopt [RFC4443]
+   terminology and call the unprocessed packet the "invoking packet".
+
+   Having received an invoking packet, the downstream node can send an
+   ICMP error message to its originator.  The ICMP error message
+   indicates why the packet could not be processed.  It also includes as
+   much of the invoking packet as possible, without violating the ICMP
+   message length limitations mentioned in (Section 8.4).
+
+   In ICMPv6, error messages are identified as such by a zero in the
+   high-order bit of their message Type field values.  Thus, ICMPv6
+   error messages have message types from 0 to 127.  ICMPv6
+   informational messages have message types from 128 to 255.
+
+   In ICMPv4, error messages cannot be identified as such by a zero in
+   the high-order bit of their message Type field values.
+
+   The Internet Assigned Numbers Authority (IANA) maintains one registy
+   of ICMPv4 message types [V4MSG] and another registry of ICMPv6
+   message types [V6MSG].  Many ICMPv4 message types have been
+   deprecated.
+
+3.1.  Message Processing
+
+3.1.1.  Known ICMP Message Types
+
+   According to [RFC1122] and [RFC4443], when a node receives an ICMP
+   error message, it must examine the message to determine:
+
+   *  whether the invoking packet originated on the local node
+
+   *  which local application or transport-layer protocol originated the
+      invoking packet
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 3]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+   If the invoking packet originated on the local node, the ICMP error
+   message must be delivered to the application or transport-layer
+   prototcol that originated it (if possible).  If the originating
+   transport-layer protocol was the User Datagram Protocol (UDP)
+   [RFC0768], UDP must, in turn, deliver the ICMP error message to the
+   application that caused the invoking packet to be sent.
+
+   When a node receives an ICMP information message, the message must be
+   delivered to the application that caused it to be sent (if possible).
+
+3.1.2.  Unknown ICMP Message Types
+
+   According to [RFC1122], if an ICMPv4 message of unknown type is
+   received, it must be silently discarded.
+
+   According to [RFC4443], if an ICMPv6 error message of unknown type is
+   received, it must be passed to the upper-layer process that
+   originated the invoking packet (if possible).  However, if an ICMP
+   informatonal message of unknown type is received, it must be silently
+   discarded.
+
+4.  ICMP Restrictions
+
+   According to [RFC1122], an ICMPv4 error message must not be sent as
+   the result of receiving:
+
+   *  an ICMP error message
+
+   *  a datagram destined to an IP broadcast or IP multicast address
+
+   *  a datagram sent as a link-layer broadcast
+
+   *  a non-initial fragment
+
+   *  a datagram whose source address does not define a single host
+      (e.g., a zero address, a broadcast address, a multicast address)
+
+   According to [RFC4443], an ICMPv4 error message must not be sent as
+   the result of receiving:
+
+   *  An ICMPv6 error message
+
+   *  An ICMPv6 redirect message
+
+   *  A packet destined to an IPv6 multicast address.
+
+   *  A packet sent as a link-layer multicast
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 4]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+   *  A packet sent as a link-layer broadcast
+
+   *  A packet whose source address does not uniquely identify a single
+      node e.g., the IPv6 Unspecified Address, an IPv6 multicast
+      address, or an address known by the ICMP message originator to be
+      an IPv6 anycast address)
+
+   The following are exceptions to the IPv6 multicast, link-layer
+   multicast, and link_layer broadcast rules above:
+
+   *  The Packet Too Big Message can be sent to allow Path MTU discovery
+      to work for IPv6 multicast
+
+   *  The Parameter Problem Message, reporting an unrecognized IPv6
+      option that has the Option Type highest-order two bits set to 10
+      can be sent
+
+5.  Extensibility:
+
+   Some ICMP messages are extensible [RFC4884].  However, the extension
+   header MUST not cause the ICMP message to violate the length
+   restrictions mentioned below.  IANA maintains a registry of ICMP
+   Extension Object Classes and Class Sub-types
+   (https://www.iana.org/assignments/icmp-parameters/icmp-
+   parameters.xhtml#icmp-parameters-ext-classes).
+
+6.  Acceptable Uses
+
+   [RFC7279] defines accpetable uses for ICMP.  The following are
+   acceptable uses:
+
+   *  to inform a datagram's originator that a forwarding plane anomaly
+      has been encountered downstream.  The datagram originator must be
+      able to determine whether or not the datagram was discarded by
+      examining the ICMP message.
+
+   *  to discover and convey dynamic information about a node (other
+      than information usually carried in routing protocols), to
+      discover and convey network-specific parameters, and to discover
+      on-link routers and hosts.
+
+   Normally, ICMP SHOULD NOT be used to implement a general-purpose
+   routing or network management protocol.  However, ICMP does have a
+   role to play in conveying dynamic information about a network, which
+   would belong in the second catagory, above.
+
+
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 5]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+7.  Management Applications
+
+   The following management applications rely on ICMP:
+
+   *  PING [RFC2151]
+
+   *  Traceroute [RFC2151]
+
+   *  Traceroute with extensions for Multiprotocol Label Switching
+      (MPLS) [RFC4950]
+
+   *  Traceroute with extensions for Interface and Next-Hop
+      Identification [RFC5837]
+
+   *  PROBE [RFC8335]
+
+8.  General Issues
+
+8.1.  Transport
+
+   ICMP messages can be lost in transport.  Therefore, the originator of
+   an ICMP message cannot rely on the message arriving at its intended
+   destination.
+
+8.2.  Rate Limits
+
+   As per [RFC1812] and [RFC4443], nodes must rate limit ICMP messages
+   that they originate.  Neither RFC specifies how strict that rate
+   limit must be.  However, the rate limit MUST be strict enough to
+   prevent a node from congesting one of its own interfaces with
+   outbound ICMP messages.
+
+8.3.  Forgery
+
+   ICMP messages are easily forged.  [RFC5927] describes how forged ICMP
+   messages can be used to attack TCP [RFC0793].  It also decribes
+   mitigations against these attacks.
+
+8.4.  Message Length
+
+   As per [RFC1812], an ICMPv4 message must not exceed 576 bytes.
+   [RFC4443] specifies no limit for ICMPv6 messages.  However, to avoid
+   fragmentation, ICMPv6 messages SHOULD not exceed the IPv6 minimum
+   required MTU [RFC8200] (i.e., 1280 bytes).
+
+
+
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 6]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+8.5.  Source Address Selection
+
+   [RFC1812] offers the following guidance regarding ICMPv4 source
+   address selection:
+
+      Except where this document specifies otherwise, the IP source
+      address in an ICMP message originated by the router MUST be one of
+      the IP addresses associated with the physical interface over which
+      the ICMP message is transmitted.  If the interface has no IP
+      addresses associated with it, the router's router-id is used
+      instead.
+
+   However [RFC4443] offer different guidance regarding ICMPv6 source
+   address selection:
+
+      If the message is a response to a message sent to one of the
+      node's unicast addresses, the Source Address of the reply MUST be
+      that same address.
+
+      If the message is a response to a message sent to any other
+      address, the Source Address of the ICMPv6 packet MUST be a unicast
+      address belonging to the node.  The address SHOULD be chosen
+      according to the rules that would be used to select the source
+      address for any other packet originated by the node, given the
+      destination address of the packet.  However, it MAY be selected in
+      an alternative way if this would lead to a more informative choice
+      of address reachable from the destination of the ICMPv6 packet.
+
+9.  Translation Considerations
+
+   Dan Wing: Please add text here
+
+   Relevant RFCs include [RFC5508] and [RFC7915].
+
+10.  IANA Considerations
+
+   This document does not make any requests of IANA
+
+11.  Security Considerations
+
+   As this document does not introduce any new protocols or operational
+   procedures, it does not introduce any new security considerations
+
+12.  Acknowledgements
+
+   The authors wish to acknowledge Joe Touch for his review and hekpful
+   comments.
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 7]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+13.  References
+
+13.1.  Normative References
+
+   [RFC0768]  Postel, J., "User Datagram Protocol", STD 6, RFC 768,
+              DOI 10.17487/RFC0768, August 1980,
+              <https://www.rfc-editor.org/rfc/rfc768>.
+
+   [RFC0791]  Postel, J., "Internet Protocol", STD 5, RFC 791,
+              DOI 10.17487/RFC0791, September 1981,
+              <https://www.rfc-editor.org/rfc/rfc791>.
+
+   [RFC0792]  Postel, J., "Internet Control Message Protocol", STD 5,
+              RFC 792, DOI 10.17487/RFC0792, September 1981,
+              <https://www.rfc-editor.org/rfc/rfc792>.
+
+   [RFC0793]  Postel, J., "Transmission Control Protocol", RFC 793,
+              DOI 10.17487/RFC0793, September 1981,
+              <https://www.rfc-editor.org/rfc/rfc793>.
+
+   [RFC1122]  Braden, R., Ed., "Requirements for Internet Hosts -
+              Communication Layers", STD 3, RFC 1122,
+              DOI 10.17487/RFC1122, October 1989,
+              <https://www.rfc-editor.org/rfc/rfc1122>.
+
+   [RFC1812]  Baker, F., Ed., "Requirements for IP Version 4 Routers",
+              RFC 1812, DOI 10.17487/RFC1812, June 1995,
+              <https://www.rfc-editor.org/rfc/rfc1812>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC4443]  Conta, A., Deering, S., and M. Gupta, Ed., "Internet
+              Control Message Protocol (ICMPv6) for the Internet
+              Protocol Version 6 (IPv6) Specification", STD 89,
+              RFC 4443, DOI 10.17487/RFC4443, March 2006,
+              <https://www.rfc-editor.org/rfc/rfc4443>.
+
+   [RFC4884]  Bonica, R., Gan, D., Tappan, D., and C. Pignataro,
+              "Extended ICMP to Support Multi-Part Messages", RFC 4884,
+              DOI 10.17487/RFC4884, April 2007,
+              <https://www.rfc-editor.org/rfc/rfc4884>.
+
+   [RFC5927]  Gont, F., "ICMP Attacks against TCP", RFC 5927,
+              DOI 10.17487/RFC5927, July 2010,
+              <https://www.rfc-editor.org/rfc/rfc5927>.
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 8]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+   [RFC7279]  Shore, M. and C. Pignataro, "An Acceptable Use Policy for
+              New ICMP Types and Codes", BCP 189, RFC 7279,
+              DOI 10.17487/RFC7279, May 2014,
+              <https://www.rfc-editor.org/rfc/rfc7279>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8200]  Deering, S. and R. Hinden, "Internet Protocol, Version 6
+              (IPv6) Specification", STD 86, RFC 8200,
+              DOI 10.17487/RFC8200, July 2017,
+              <https://www.rfc-editor.org/rfc/rfc8200>.
+
+13.2.  Informative References
+
+   [RFC2151]  Kessler, G. and S. Shepard, "A Primer On Internet and TCP/
+              IP Tools and Utilities", FYI 30, RFC 2151,
+              DOI 10.17487/RFC2151, June 1997,
+              <https://www.rfc-editor.org/rfc/rfc2151>.
+
+   [RFC4950]  Bonica, R., Gan, D., Tappan, D., and C. Pignataro, "ICMP
+              Extensions for Multiprotocol Label Switching", RFC 4950,
+              DOI 10.17487/RFC4950, August 2007,
+              <https://www.rfc-editor.org/rfc/rfc4950>.
+
+   [RFC5508]  Srisuresh, P., Ford, B., Sivakumar, S., and S. Guha, "NAT
+              Behavioral Requirements for ICMP", BCP 148, RFC 5508,
+              DOI 10.17487/RFC5508, April 2009,
+              <https://www.rfc-editor.org/rfc/rfc5508>.
+
+   [RFC5837]  Atlas, A., Ed., Bonica, R., Ed., Pignataro, C., Ed., Shen,
+              N., and JR. Rivers, "Extending ICMP for Interface and
+              Next-Hop Identification", RFC 5837, DOI 10.17487/RFC5837,
+              April 2010, <https://www.rfc-editor.org/rfc/rfc5837>.
+
+   [RFC7915]  Bao, C., Li, X., Baker, F., Anderson, T., and F. Gont,
+              "IP/ICMP Translation Algorithm", RFC 7915,
+              DOI 10.17487/RFC7915, June 2016,
+              <https://www.rfc-editor.org/rfc/rfc7915>.
+
+   [RFC8335]  Bonica, R., Thomas, R., Linkova, J., Lenart, C., and M.
+              Boucadair, "PROBE: A Utility for Probing Interfaces",
+              RFC 8335, DOI 10.17487/RFC8335, February 2018,
+              <https://www.rfc-editor.org/rfc/rfc8335>.
+
+
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024                [Page 9]
+
+Internet-Draft         ICMP Operational Experience              May 2024
+
+
+   [V4MSG]    Internet Assigned Numbers Authority (IANA), "Internet
+              Control Message Protocol (ICMP) Parameters", Web 
+              https://www.iana.org/assignments/icmp-parameters.
+
+   [V6MSG]    Internet Assigned Numbers Authority (IANA), "Internet
+              Control Message Protocol version 6 (ICMPv6) Parameters",
+              Web https://www.iana.org/assignments/icmpv6-parameters.
+
+Authors' Addresses
+
+   Ron Bonica
+   Juniper Networks
+   Herndon, Virginia
+   United States of America
+   Email: rbonica@juniper.net
+
+
+   Carlos Pignataro
+   Blue Fern Consulting
+   Raleigh, NC
+   United States of America
+   Email: cpignata@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Bonica & Pignataro      Expires 28 November 2024               [Page 10]
