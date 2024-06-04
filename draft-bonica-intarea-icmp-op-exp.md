@@ -201,6 +201,10 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 
 > If the message is a response to a message sent to any other address, the Source Address of the ICMPv6 packet MUST be a unicast address belonging to the node.  The address SHOULD be chosen according to the rules that would be used to select the source address for any other packet originated by the node, given the destination address of the packet.  However, it MAY be selected in an alternative way if this would lead to a more informative choice of address reachable from the destination of the ICMPv6 packet.
 
+## Path Selection
+
+ICMP error messages are usually path independent. However, ICMP informational messages are sometimes necessary to follow a specific transport path. To be fate-sharing with a data packet, an ICMP Echo Request needs to be applied a routing policy or populated a set of ECMP affecting fields. To achieve path consistency between an ICMP Echo Request and an ICMP Echo Reply, some given field needs to be carried by the ICMP Echo Request to instruct the responding node how to construct the ICMP Echo Reply.
+
 # Translation Considerations
 
 Dan Wing: Please add text here
