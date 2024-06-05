@@ -203,7 +203,14 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 
 ## Path Selection
 
-ICMP error messages are usually path independent. However, ICMP informational messages are sometimes necessary to follow a specific transport path. To be fate-sharing with a data packet, an ICMP Echo Request needs to be applied a routing policy or populated a set of ECMP affecting fields. To achieve path consistency between an ICMP Echo Request and an ICMP Echo Reply, some given field needs to be carried by the ICMP Echo Request to instruct the responding node how to construct the ICMP Echo Reply.
+{{RFC7279}} provides a rough breakdown of ICMP message types. The following are ICMP classifications:
+
+- IPv4 forwarding plane anomaly reporting
+- IPv4 router or host discovery
+- IPv6 forwarding plane anomaly reporting
+- IPv6 router or host discovery
+
+When the ICMP messages are used for IPv4/IPv6 forwarding plane anomaly reporting, they're also known as ICMP error messages. ICMP error messages are usually path independent, in other words, it's not required for the ICMP error messages to select a specific forwarding path from the downstream node to the datagram's originator. When the ICMP messages are used for IPv4/IPv6 router or host discovery, they're also known as ICMP informational messages. ICMP informational messages are sometimes path dependent, in other words, it's required for the ICMP informational messages to select a specific forwarding path between the peers. One example is when ICMP is used as a tool of TRACEROUTE and there are more than one path from the source to the destination, to make the synthetic ICMP message fate-sharing with the data packet, a specific path from the source to the destination needs to be selected for the ICMP message. Another example is when ICMPv6 is used as a tool of SRv6 policy verification and there are more than one path from the endpoint to the headend of the verified SRv6 policy, to achieve path congruence of the forward and reverse direction between the headend and the endpoint, i.e., the ICMPv6 message in the reverse direction traverses the same set of nodes and links designated by the SRv6 policy, a specific path from the endpoint to the headend needs to be selected for the ICMPv6 message.
 
 # Translation Considerations
 
