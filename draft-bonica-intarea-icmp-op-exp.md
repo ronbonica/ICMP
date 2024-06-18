@@ -33,6 +33,13 @@ author:
     org: Blue Fern Consulting
     country: USA
     email: cpignata@gmail.com
+  -
+    ins: X. Min
+    name: Xiao Min
+    city: Nanjing
+    org: ZTE Corp.
+    country: China
+    email: xiao.min2@zte.com.cn
 
 normative:
   RFC0768:
@@ -54,6 +61,7 @@ informative:
   RFC8335:
   RFC5508:
   RFC7915:
+  RFC9359:
 
   V4MSG:
     title: Internet Control Message Protocol (ICMP) Parameters
@@ -203,14 +211,9 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 
 ## Path Selection
 
-{{RFC7279}} provides a rough breakdown of ICMP message types. The following are ICMP classifications:
+ICMP messages are typically path independent. This means that the IP layer determines the first-hop through which the ICMP message is forwarded. ICMP does not influence the IP layer's first hop selection.
 
-- IPv4 forwarding plane anomaly reporting
-- IPv4 router or host discovery
-- IPv6 forwarding plane anomaly reporting
-- IPv6 router or host discovery
-
-When the ICMP messages are used for IPv4/IPv6 forwarding plane anomaly reporting, they're also known as ICMP error messages. ICMP error messages are usually path independent, in other words, it's not required for the ICMP error messages to select a specific forwarding path from the downstream node to the datagram's originator. When the ICMP messages are used for IPv4/IPv6 router or host discovery, they're also known as ICMP informational messages. ICMP informational messages are sometimes path dependent, in other words, it's required for the ICMP informational messages to select a specific forwarding path between the peers. One example is when ICMP is used as a tool of TRACEROUTE and there are more than one path from the source to the destination, to make the synthetic ICMP message fate-sharing with the data packet, a specific path from the source to the destination needs to be selected for the ICMP message. {{RFC9359}} provides an application scenario of this kind of path-dependent TRACEROUTE, the datagram's originator firstly sends path-dependent ICMPv6 Echo Request (Type 128) to discover all routers along the specific forwarding path, and then it sends ICMPv6 Node Information Query (Type 139) to each of the discovered routers for acquiring router's enabled In situ OAM (IOAM) capabilities.
+In at least one case, ICMP messages are not path independent. {{RFC9359}} describes a situation in which an ICMP message must be forwarded through a specific interface. That is, it must be forwarded through the interface upon which the packet that caused it to be sent arrived.
 
 # Translation Considerations
 
