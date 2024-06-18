@@ -207,6 +207,17 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 
 > If the message is a response to a message sent to any other address, the Source Address of the ICMPv6 packet MUST be a unicast address belonging to the node.  The address SHOULD be chosen according to the rules that would be used to select the source address for any other packet originated by the node, given the destination address of the packet.  However, it MAY be selected in an alternative way if this would lead to a more informative choice of address reachable from the destination of the ICMPv6 packet.
 
+## Path Selection
+
+{{RFC7279}} provides a rough breakdown of ICMP message types. The following are ICMP classifications:
+
+- IPv4 forwarding plane anomaly reporting
+- IPv4 router or host discovery
+- IPv6 forwarding plane anomaly reporting
+- IPv6 router or host discovery
+
+When the ICMP messages are used for IPv4/IPv6 forwarding plane anomaly reporting, they're also known as ICMP error messages. ICMP error messages are usually path independent, in other words, it's not required for the ICMP error messages to select a specific forwarding path from the downstream node to the datagram's originator. When the ICMP messages are used for IPv4/IPv6 router or host discovery, they're also known as ICMP informational messages. ICMP informational messages are sometimes path dependent, in other words, it's required for the ICMP informational messages to select a specific forwarding path between the peers. One example is when ICMP is used as a tool of TRACEROUTE and there are more than one path from the source to the destination, to make the synthetic ICMP message fate-sharing with the data packet, a specific path from the source to the destination needs to be selected for the ICMP message. {{RFC9359}} provides an application scenario of this kind of path-dependent TRACEROUTE, the datagram's originator firstly sends path-dependent ICMPv6 Echo Request (Type 128) to discover all routers along the specific forwarding path, and then it sends ICMPv6 Node Information Query (Type 139) to each of the discovered routers for acquiring router's enabled In situ OAM (IOAM) capabilities.
+
 # Translation Considerations
 
 IPv4 hosts will often communicate with an IPv4 host through an
