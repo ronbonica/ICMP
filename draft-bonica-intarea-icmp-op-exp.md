@@ -39,6 +39,13 @@ author:
     organization: Cloud Software Group Holdings, Inc.
     abbrev: Cloud Software Group
     email: danwing@gmail.com
+  -
+    ins: X. Min
+    name: Xiao Min
+    city: Nanjing
+    org: ZTE Corp.
+    country: China
+    email: xiao.min2@zte.com.cn
 
 normative:
   RFC0768:
@@ -60,6 +67,7 @@ informative:
   RFC8335:
   RFC5508:
   RFC7915:
+  RFC9359:
 
   V4MSG:
     title: Internet Control Message Protocol (ICMP) Parameters
@@ -206,6 +214,12 @@ However {{RFC4443}} offer different guidance regarding ICMPv6 source address sel
 > If the message is a response to a message sent to one of the node's unicast addresses, the Source Address of the reply MUST be that same address.
 
 > If the message is a response to a message sent to any other address, the Source Address of the ICMPv6 packet MUST be a unicast address belonging to the node.  The address SHOULD be chosen according to the rules that would be used to select the source address for any other packet originated by the node, given the destination address of the packet.  However, it MAY be selected in an alternative way if this would lead to a more informative choice of address reachable from the destination of the ICMPv6 packet.
+
+## Path Selection
+
+ICMP messages are typically path independent. This means that the IP layer determines the first-hop through which the ICMP message is forwarded. ICMP does not influence the IP layer's first hop selection.
+
+In at least one case, ICMP messages are not path independent. {{RFC9359}} describes a situation in which an ICMP message must be forwarded through a specific interface. That is, the ICMP message must be forwarded through the interface upon which the packet that caused it to be sent arrived.
 
 # Translation Considerations
 
