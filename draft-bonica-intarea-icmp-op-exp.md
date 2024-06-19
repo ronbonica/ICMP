@@ -4,7 +4,7 @@ coding: us-ascii
 
 title: 'Internet Control Message Protocol (ICMP): Standards and Operational Experience'
 abbrev: ICMP Operational Experience
-docname: draft-bonica-intarea-icmp-op-exp
+docname: draft-bonica-intarea-icmp-op-exp-latest
 category: info
 submissiontype: IETF
 
