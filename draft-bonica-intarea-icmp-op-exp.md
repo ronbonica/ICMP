@@ -4,7 +4,7 @@ coding: us-ascii
 
 title: 'Internet Control Message Protocol (ICMP): Standards and Operational Experience'
 abbrev: ICMP Operational Experience
-docname: draft-bonica-intarea-icmp-op-exp
+docname: draft-bonica-intarea-icmp-op-exp-latest
 category: info
 submissiontype: IETF
 
@@ -17,7 +17,7 @@ wg: INTAREA Working Group
 kw: ICMP operations
 
 author:
-  -
+ -
     ins: R. Bonica
     name: Ron Bonica
     city: Herndon
@@ -25,7 +25,7 @@ author:
     org: Juniper Networks
     country: USA
     email: rbonica@juniper.net
-  -
+ -
     ins: C. Pignataro
     name: Carlos Pignataro
     city: Raleigh
