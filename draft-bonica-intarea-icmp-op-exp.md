@@ -160,9 +160,9 @@ The following are exceptions to the IPv6 multicast, link-layer multicast, and li
 * The Parameter Problem Message, reporting an unrecognized IPv6 option that has the Option Type highest-order two bits set to 10 can be sent
 
 
-# Extensibility:
+# Extensibility
 
-Some ICMP messages are extensible {{RFC4884}}. However, the extension header MUST not cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes).
+Some ICMP messages are extensible {{RFC4884}}. However, the extension header MUST NOT cause the ICMP message to violate the length restrictions mentioned below. IANA maintains a registry of [ICMP Extension Object Classes and Class Sub-types](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-ext-classes).
 
 # Acceptable Uses
 
@@ -201,7 +201,7 @@ ICMP messages are easily forged. {{RFC5927}} describes how forged ICMP messages 
 
 ## Message Length {#length}
 
-As per {{RFC1812}}, an ICMPv4 message must not exceed 576 bytes. {{RFC4443}} specifies no limit for ICMPv6 messages. However, to avoid fragmentation, ICMPv6 messages SHOULD not exceed the IPv6 minimum required MTU {{RFC8200}} (i.e., 1280 bytes).
+As per {{RFC1812}}, an ICMPv4 message must not exceed 576 bytes. {{RFC4443}} specifies no limit for ICMPv6 messages. However, to avoid fragmentation, ICMPv6 messages SHOULD NOT exceed the IPv6 minimum required MTU {{RFC8200}} (i.e., 1280 bytes).
 
 ## Source Address Selection
 
@@ -247,7 +247,7 @@ As this document does not introduce any new protocols or operational procedures,
 
 # Acknowledgements
 
-The authors wish to acknowledge Joe Touch for his review and hekpful comments.
+The authors wish to acknowledge Joe Touch for his review and helpful comments.
 
 
 
